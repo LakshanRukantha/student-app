@@ -1,6 +1,8 @@
 import 'package:cherry_toast/cherry_toast.dart';
 import 'package:cherry_toast/resources/arrays.dart';
 import 'package:flutter/material.dart';
+import 'package:student_app/data/datasource.dart';
+import 'package:student_app/models/student.dart';
 
 class ReadScreen extends StatefulWidget {
   const ReadScreen({super.key});
@@ -10,6 +12,21 @@ class ReadScreen extends StatefulWidget {
 }
 
 class _ReadScreenState extends State<ReadScreen> {
+  List<Student> students = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadStudents();
+  }
+
+  Future<void> _loadStudents() async {
+    final loadedStudents = await Database().getStudents();
+    setState(() {
+      students = loadedStudents;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,19 +47,21 @@ class _ReadScreenState extends State<ReadScreen> {
             Expanded(
                 child: ListView(
               children: [
-                ListTile(
-                  title: Text("Student 1"),
-                  subtitle: Text("Degree: Computer Science"),
-                  trailing: Icon(Icons.arrow_forward),
-                  onTap: () {
-                    CherryToast.info(
-                      title: Text(
-                        "Student 1 Details",
-                        style: TextStyle(color: Colors.black),
-                      ),
-                      toastPosition: Position.bottom,
-                    ).show(context);
-                  },
+                ...students.map(
+                  (student) => ListTile(
+                    title: Text(student.name),
+                    subtitle: Text("Degree: ${student.degree}"),
+                    trailing: Icon(Icons.arrow_forward),
+                    onTap: () {
+                      CherryToast.info(
+                        title: Text(
+                          "Created at ${student.createdAt?.toDate()}",
+                          style: TextStyle(color: Colors.black),
+                        ),
+                        toastPosition: Position.bottom,
+                      ).show(context);
+                    },
+                  ),
                 ),
               ],
             )),
@@ -51,9 +70,10 @@ class _ReadScreenState extends State<ReadScreen> {
                 style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent),
                 onPressed: () {
+                  _loadStudents();
                   CherryToast.success(
                     title: Text(
-                      "The simplest cherry toast",
+                      "Data Refreshed",
                       style: TextStyle(color: Colors.black),
                     ),
                     toastPosition: Position.bottom,

@@ -69,6 +69,7 @@ class _CreatePageState extends State<CreatePage> {
                 "id": idController.text,
                 "name": nameController.text,
                 "degree": degreeController.text,
+                "createdAt": DateTime.now(),
               };
 
               try {
